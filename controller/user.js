@@ -36,13 +36,33 @@ const loginUser = async (req, res) => {
       token: token,
       id: user._id,
       firstName: user.Firstname,
-      LastName: user.Lastname
+      lastName: user.Lastname
     };
-    res.header('Authorization', `Bearer ${token}`).send(response);
+    const oneDayFromNow = new Date(Date.now() + (24 * 60 * 60 * 1000)); // 24 hours in milliseconds
+
+    res.cookie("jwt", token, { expires: oneDayFromNow, httpOnly: true }).send(response);
   } else {
     return res.status(401).send({ auth: false, message: 'Invalid password' })
   }
 
 }
+const getSpecificUser=async (req,res)=>{
+  try{
+  let user=await Users.findById(req.params.id)
+  if(user){
+    const response={
+      id: user._id,
+      firstName: user.Firstname,
+      lastName: user.Lastname
+    };
+   res.json(response)
+  }else{
+    res.status(404).json({search:0,message:"No User with this ID found!"})
+  }
+}catch(err){
+    console.log(err)
+    return res.status(500).send({serch:0,message:"Server error"})
+  }
+}
 
-module.exports = { createUser, updateUser, deleteUser, loginUser }
+module.exports = { createUser, updateUser, deleteUser, loginUser,getSpecificUser }

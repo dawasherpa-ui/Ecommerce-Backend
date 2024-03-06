@@ -1,11 +1,15 @@
 const express = require("express");
 const cors=require("cors")
+const cookieParser =require("cookie-parser")
 const app = express();
 const mongoose = require("mongoose");
 const { activityMiddleware } = require("./middleware/middleware");
+const { verifyToken} = require("./middleware/auth");
 const router = require("./router/product");
 const userRouter = require("./router/user");
-const DB = `mongodb+srv://jamudawa2:ayGNdH16ru30XAFC@cluster0.um2ki1w.mongodb.net/ruzabelle?retryWrites=true&w=majority`;
+require('dotenv').config();
+const DB = process.env.DB_Url
+const Port  = process.env.PORT || 3000
 
 // connect MongoDB
 mongoose
@@ -13,12 +17,18 @@ mongoose
   .then(() => console.log("connected MongoDB"))
   .catch((err) => console.log("error", err));
 // Middleware
-app.use(cors())
+const allowedOrigins = ['http://localhost:5173','http://localhost:3000', 'http://192.168.1.88:5173'];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+app.use(cookieParser())
 app.use(activityMiddleware);
 // Routers
 app.get("/",(req,res)=>res.send("<h1>Hello World!</h1>"));
-app.use("/api/product", router);
+app.use("/api/product",verifyToken, router);
 app.use("/api/user",userRouter)
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+app.listen(Port, () => {
+  console.log("Server running on port",Port);
 });
