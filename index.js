@@ -17,7 +17,7 @@ mongoose
   .then(() => console.log("connected MongoDB"))
   .catch((err) => console.log("error", err));
 // Middleware
-const allowedOrigins = ['http://localhost:5173','http://localhost:3000', 'http://192.168.1.88:5173'];
+const allowedOrigins = ['https://ecommerce-eight-khaki.vercel.app','http://localhost:3000', 'http://192.168.1.88:5173'];
 
 app.use(cors({
   origin: allowedOrigins,
